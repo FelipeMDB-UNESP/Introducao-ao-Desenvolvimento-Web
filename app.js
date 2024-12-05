@@ -7,24 +7,41 @@ const ejs = require('ejs');
 require('dotenv').config();
 
 const port = 8080;
-const client = new MongoClient(process.env.URI);
-const dataBaseName = "recipe_site";
-const collectionName = "recipes";
+const client = new MongoClient(process.env.URI, { useNewUrlParser: true, useUnifiedTopology: true });
+const dataBaseName = "Atividade";
+const collectionName = "Receitas";
 
 server.set('view engine', 'ejs');
 
 server.use(express.static('public'));
 
+// Rota principal para renderizar index.ejs com dados do banco de dados
 server.get('/', async (request, response) => {
-    response.send(await readFile('./index.html', 'utf8'));
+    try {
+        await client.connect();
+        const receitas = await client.db(dataBaseName).collection(collectionName).find().toArray();
+        response.render('index', { receitas: receitas });
+    } catch (error) {
+        console.error(error);
+        response.status(500).send('Erro ao carregar receitas');
+    }
 });
 
-server.get('/receitas*', async (request, response) => {
-    const name = request.path.split("/").pop();
-    upperName = name.charAt(0).toUpperCase() + name.slice(1);
-    data = await client.db(dataBaseName).collection(collectionName).findOne({ nome: upperName });
-    data.imagem = "data:image/svg+xml;base64, " + data.imagem;
-    response.render('recipe', data);
+// Rota dinâmica para cada receita
+server.get('/receitas/:nome', async (request, response) => {
+    try {
+        await client.connect();
+        const nomeReceita = request.params.nome.replace(/-/g, ' ');
+        const receita = await client.db(dataBaseName).collection(collectionName).findOne({ nome: new RegExp('^' + nomeReceita + '$', 'i') });
+        if (receita) {
+            response.render('recipe', { receita: receita });
+        } else {
+            response.status(404).send('Receita não encontrada');
+        }
+    } catch (error) {
+        console.error(error);
+        response.status(500).send('Erro ao carregar a receita');
+    }
 });
 
 server.use(async (request, response) => {
@@ -32,4 +49,3 @@ server.use(async (request, response) => {
 });
 
 server.listen(process.env.PORT || port, () => console.log(`App available on http://localhost:${port}`));
-

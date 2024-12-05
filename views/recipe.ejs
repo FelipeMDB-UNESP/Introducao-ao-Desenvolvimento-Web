@@ -1,39 +1,34 @@
-<main>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title><%= receita.nome %></title>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css" />
     <script src="/js/reviewrecipe.js"></script>
-
+</head>
+<body>
     <div class="container" id="container">
-        <link rel="stylesheet" type="text/css" href="/css/styles.css" />
-        <h1 id='header'>
-            <%=data.nome%>
-        </h1>
-        <img src="<%=data.imagem%>" alt='Ilustração vetorial de um brigadeiro' style="width:500px;height:500px;">
-        <h3 class="subtitle">
-            <%=data.subtitulo%>
-        </h3>
-        <p class="description">
-            <%= data.descricao%>
-        </p>
-        <p></p>
+        <h1 id='header'><%= receita.nome %></h1>
+        <img src="<%= receita.imagem %>" alt='Ilustração da receita' style="width:500px;height:500px;">
+        <h3 class="subtitle"><%= receita.subtitulo %></h3>
+        <p class="description"><%= receita.descricao %></p>
+        
         <div>
             <h4 class="ingredients">Ingredientes</h4>
             <ul>
-                <% for(var i=0; i< data.ingredientes.length; i++) {%>
-                    <li>
-                        <%=data.ingredientes[i]%>
-                    </li>
-                    <% } %>
+                <% receita.ingredientes.forEach(function(ingrediente) { %>
+                    <li><%= ingrediente %></li>
+                <% }); %>
             </ul>
         </div>
+        
         <div id='recipe'>
             <h4 class="recipe">Modo de preparo</h4>
-            <h5 class="time">Tempo: <%=data.tempo_de_preparo[i]%>
-            </h5>
+            <h5 class="time">Tempo: <%= receita.tempo_de_preparo %></h5>
             <ol>
-                <% for(var i=0; i< data.modo_de_preparo.length; i++) {%>
-                    <li>
-                        <%=data.modo_de_preparo[i]%>
-                    </li>
-                    <% } %>
+                <% receita.modo_de_preparo.forEach(function(passo) { %>
+                    <li><%= passo %></li>
+                <% }); %>
             </ol>
         </div>
 
@@ -50,4 +45,5 @@
         <p></p>
         <a href="../">Retornar à página principal</a>
     </div>
-</main>
+</body>
+</html>
